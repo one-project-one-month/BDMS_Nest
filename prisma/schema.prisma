@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum BloodType {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum DonationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FAILED
+  COMPLETED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FAILED
+  COMPLETED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CANCELLED
+  FAILED
+  COMPLETED
+}
+
+enum AppointmentType {
+  DONATION
+  REQUEST
+}
+
+model User {
+  id                 String     @id @default(uuid())
+  full_name          String
+  user_name          String     @unique
+  password           String
+  phone_number       String?
+  blood_type         BloodType?
+  address            String?
+  role               Role       @default(USER)
+  last_donation_date DateTime?
+  is_active          Boolean    @default(true)
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @updatedAt
+
+  donations         Donation[]    @relation("DonorDonations")
+  approvedDonations Donation[]    @relation("ApprovedDonations")
+  requests          Request[]     @relation("UserRequests")
+  approvedRequests  Request[]     @relation("ApprovedRequests")
+  appointments      Appointment[]
+}
+
+model Donation {
+  id            String         @id @default(uuid())
+  user_id       String
+  donation_code String         @unique
+  status        DonationStatus @default(PENDING)
+  donation_date DateTime
+  approved_by   String?
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+
+  user         User          @relation("DonorDonations", fields: [user_id], references: [id])
+  approver     User?         @relation("ApprovedDonations", fields: [approved_by], references: [id])
+  appointments Appointment[]
+}
+
+model Request {
+  id           String        @id @default(uuid())
+  user_id      String
+  request_code String        @unique
+  blood_type   BloodType
+  status       RequestStatus @default(PENDING)
+  units_needed Int
+  request_date DateTime
+  approved_by  String?
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+
+  user         User          @relation("UserRequests", fields: [user_id], references: [id])
+  approver     User?         @relation("ApprovedRequests", fields: [approved_by], references: [id])
+  appointments Appointment[]
+}
+
+model Appointment {
+  id               String            @id @default(uuid())
+  user_id          String
+  request_id       String?
+  donation_id      String?
+  appointment_type AppointmentType
+  appointment_date DateTime
+  status           AppointmentStatus @default(PENDING)
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+
+  user     User      @relation(fields: [user_id], references: [id])
+  request  Request?  @relation(fields: [request_id], references: [id])
+  donation Donation? @relation(fields: [donation_id], references: [id])
+}
+
+model BloodInventory {
+  id              String    @id @default(uuid())
+  blood_type      BloodType @unique
+  units_available Int       @default(0)
+  last_updated    DateTime  @updatedAt
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+}
+
+model Announcement {
+  id         String    @id @default(uuid())
+  title      String
+  content    String
+  is_active  Boolean   @default(true)
+  expired_at DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+}
