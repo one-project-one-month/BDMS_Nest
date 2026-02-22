@@ -33,19 +33,13 @@ git clone https://github.com/one-project-one-month/BDMS_Nest.git
 cd BDMS_Nest
 ```
 
-### 2. Configure pnpm store (Windows only) - Optional\_\_Only If you encounter errors
-
-```bash
-pnpm config set store-dir "C:/.pnpm-store"
-```
-
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### 4. Setup environment variables
+### 3. Setup environment variables
 
 ```bash
 cp .env.example .env
@@ -64,7 +58,7 @@ JWT_REFRESH_SECRET=your_refresh_secret_here
 JWT_REFRESH_EXPIRES_IN=30d
 ```
 
-### 5. Start the database
+### 4. Start the database
 
 ```bash
 docker-compose up -d
@@ -78,19 +72,19 @@ docker ps
 
 You should see `bdms_db` running.
 
-### 6. Run Prisma migrations
+### 5. Run Prisma migrations
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-### 7. Generate Prisma client
+### 6. Generate Prisma client
 
 ```bash
 npx prisma generate
 ```
 
-### 8. Start the application
+### 7. Start the application
 
 ```bash
 pnpm run start:dev
