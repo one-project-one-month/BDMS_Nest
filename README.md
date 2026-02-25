@@ -180,8 +180,7 @@ git push origin feature/
 
 - Never push directly to `main` or `dev`
 - Always branch off from `dev`
-- PR target is always `dev`
-- Only team leader merges `dev` → `main`
+- Always create a PR and target is always `dev`
 - Pull latest `dev` before starting new work
 
 **Branch naming:**
@@ -194,12 +193,6 @@ git push origin feature/
 | Appointments | `feature/appointments` |
 | Blood Inventory | `feature/blood-inventory` |
 | Announcements | `feature/announcements` |
-
-**Rules:**
-
-- Never push directly to `main` or `dev`
-- Always create a PR and request review from team leader
-- Pull latest `main` or `dev` before starting new work
 
 ---
 
