@@ -9,9 +9,11 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import appConfig, { validationSchema } from './config/app.config';
-import { AppConfigService } from './config/config.helper';
+import { AppConfigModule } from './config/module.config';
+import { MedicalRecordsModule } from './medical-records/medical-records.module';
+import { CertificatesModule } from './certificates/certificates.module';
 
 @Module({
   imports: [
@@ -24,14 +26,9 @@ import { AppConfigService } from './config/config.helper';
         abortEarly: false, // shows ALL missing vars at once
       }
     }),
-    UsersModule, RequestsModule, DonationsModule, BloodInventoryModule, AppointmentsModule, AnnouncementsModule, AuthModule, DatabaseModule],
+    AppConfigModule,
+    UsersModule, RequestsModule, DonationsModule, BloodInventoryModule, AppointmentsModule, AnnouncementsModule, AuthModule, DatabaseModule, MedicalRecordsModule, CertificatesModule],
   controllers: [AppController],
-  providers: [AppService,
-    {
-      provide: AppConfigService,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => new AppConfigService(configService),
-    }
-  ],
+  providers: [AppService],
 })
 export class AppModule { }

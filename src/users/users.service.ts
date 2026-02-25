@@ -1,35 +1,172 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
+import { DatabaseService } from '../database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersQueryDto } from './dto/query/users.dto';
-import { paginate, paginatedResult } from 'src/common/helpers/paginate.helper';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { paginate, paginatedResult } from '../common/helpers/paginate.helper';
+import * as bcrypt from 'bcryptjs';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private prisma: DatabaseService) { }
+
+  private readonly selectUser: Prisma.UserSelect = {
+    id: true,
+    full_name: true,
+    user_name: true,
+    phone_number: true,
+    blood_type: true,
+    address: true,
+    role: true,
+    last_donation_date: true,
+    is_active: true,
+    created_at: true,
+    updated_at: true,
+    password: false,
+  };
+
+  async findByUsername(user_name: string) {
+    return this.prisma.user.findUnique({
+      where: { user_name },
+    });
   }
 
-  findAll(query: UsersQueryDto) {
-    const { page, limit } = query;
+  async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: this.selectUser,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  // internal use only - no response formatting or error handling here
+  // for reducing db payload size
+  async checkExistsByUsername(user_name: string) {
+    return this.prisma.user.findUnique({
+      where: { user_name },
+      select: { id: true },
+    });
+  }
+
+  async create(dto: CreateUserDto) {
+    const existing = await this.checkExistsByUsername(dto.user_name);
+
+    if (existing) {
+      throw new ConflictException('Username already taken');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    return this.prisma.user.create({
+      data: {
+        ...dto,
+        password: hashedPassword,
+      },
+      select: this.selectUser,
+    });
+  }
+
+  // used by controller
+  async findAll(dto: PaginationDto) {
+    const { page, limit, search } = dto;
     const { skip, take } = paginate(page, limit);
 
-    const total = 0; // Replace with actual total count from database
+    const where: Prisma.UserWhereInput = {};
+
+    if (search) {
+      where.OR = [
+        { full_name: { contains: search, mode: 'insensitive' } },
+        { user_name: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        select: this.selectUser,
+        skip,
+        take,
+        orderBy: { created_at: 'desc' },
+      }),
+      this.prisma.user.count({
+        where: search
+          ? {
+            OR: [
+              { full_name: { contains: search, mode: 'insensitive' } },
+              { user_name: { contains: search, mode: 'insensitive' } },
+            ]
+          }
+          : {},
+      }),
+    ])
 
     return {
-      data: paginatedResult([], total, page, limit),
+      message: 'Users fetched successfully',
+      data: paginatedResult(data, total, page, limit),
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.findById(id);
+
+    return {
+      message: 'User fetched successfully',
+      data: user,
+    };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, dto: UpdateUserDto) {
+    await this.findById(id); // throws if not found
+
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: dto,
+      select: this.selectUser,
+    });
+
+    return {
+      message: 'User updated successfully',
+      data: user,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async toggleActive(id: string) {
+    const user = await this.findById(id);
+
+    const updated = await this.prisma.user.update({
+      where: { id },
+      data: { is_active: !user.is_active },
+      select: this.selectUser,
+    });
+
+    return {
+      message: `User ${updated.is_active ? 'activated' : 'deactivated'} successfully`,
+      data: updated,
+    };
+  }
+
+  async remove(id: string) {
+    await this.findById(id); // throws if not found
+
+    await this.prisma.user.delete({ where: { id } });
+
+    return {
+      message: 'User deleted successfully',
+      data: null,
+    };
   }
 }
