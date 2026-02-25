@@ -13,7 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Role } from '@prisma/client';
+import { Role } from 'prisma/generated/enums';
 import { Roles } from 'src/auth/decorators/roles.decortor';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import * as requestedUserInterface from 'src/common/interfaces/requested-user.interface';

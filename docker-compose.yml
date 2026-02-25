@@ -2,7 +2,7 @@ name: bdms_nest
 
 services:
   postgres:
-    image: postgres
+    image: postgres:15
     container_name: bdms_db
     environment:
       POSTGRES_DB: bdms

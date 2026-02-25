@@ -4,7 +4,7 @@ import { UpdateAnnouncementDto } from './dto/update-announcement.dto';
 import { paginate, paginatedResult } from 'src/common/helpers/paginate.helper';
 import { AnnouncementsQueryDto } from './dto/query/announcements.dto';
 import { DatabaseService } from 'src/database/database.service';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/client';
 
 @Injectable()
 export class AnnouncementsService {

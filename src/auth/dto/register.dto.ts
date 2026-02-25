@@ -5,7 +5,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { BloodType, Role } from '@prisma/client';
+import { BloodType, Role } from 'prisma/generated/enums';
 
 export class RegisterDto {
   @IsNotEmpty()
