@@ -2,40 +2,42 @@ import { ConfigService } from '@nestjs/config';
 import { StringValue } from 'ms';
 
 export class AppConfigService {
-    constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
-    // App
-    get port(): number {
-        return this.configService.get<number>('app.port')!;
-    }
+  // App
+  get port(): number {
+    return this.configService.get<number>('app.port')!;
+  }
 
-    get nodeEnv(): string {
-        return this.configService.get<string>('app.nodeEnv')!;
-    }
+  get nodeEnv(): string {
+    return this.configService.get<string>('app.nodeEnv')!;
+  }
 
-    get appName(): string {
-        return this.configService.get<string>('app.name')!;
-    }
+  get appName(): string {
+    return this.configService.get<string>('app.name')!;
+  }
 
-    // Database
-    get databaseUrl(): string {
-        return this.configService.get<string>('database.url')!;
-    }
+  // Database
+  get databaseUrl(): string {
+    return this.configService.get<string>('database.url')!;
+  }
 
-    // JWT
-    get jwtSecret(): string {
-        return this.configService.get<string>('jwt.secret')!;
-    }
+  // JWT
+  get jwtSecret(): string {
+    return this.configService.get<string>('jwt.secret')!;
+  }
 
-    get jwtExpiresIn(): StringValue {
-        return (this.configService.get<string>('jwt.expiresIn') || '7d') as StringValue;
-    }
+  get jwtExpiresIn(): StringValue {
+    return (this.configService.get<string>('jwt.expiresIn') ||
+      '7d') as StringValue;
+  }
 
-    get jwtRefreshSecret(): string {
-        return this.configService.get<string>('jwt.refreshSecret')!;
-    }
+  get jwtRefreshSecret(): string {
+    return this.configService.get<string>('jwt.refreshSecret')!;
+  }
 
-    get jwtRefreshExpiresIn(): StringValue {
-        return (this.configService.get<string>('jwt.refreshExpiresIn') || '30d') as StringValue;
-    }
+  get jwtRefreshExpiresIn(): StringValue {
+    return (this.configService.get<string>('jwt.refreshExpiresIn') ||
+      '30d') as StringValue;
+  }
 }

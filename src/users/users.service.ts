@@ -9,11 +9,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { paginate, paginatedResult } from '../common/helpers/paginate.helper';
 import * as bcrypt from 'bcryptjs';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'prisma/generated/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: DatabaseService) { }
+  constructor(private prisma: DatabaseService) {}
 
   private readonly selectUser: Prisma.UserSelect = {
     id: true,
@@ -101,14 +101,14 @@ export class UsersService {
       this.prisma.user.count({
         where: search
           ? {
-            OR: [
-              { full_name: { contains: search, mode: 'insensitive' } },
-              { user_name: { contains: search, mode: 'insensitive' } },
-            ]
-          }
+              OR: [
+                { full_name: { contains: search, mode: 'insensitive' } },
+                { user_name: { contains: search, mode: 'insensitive' } },
+              ],
+            }
           : {},
       }),
-    ])
+    ]);
 
     return {
       message: 'Users fetched successfully',

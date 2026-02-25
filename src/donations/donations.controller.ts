@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { UpdateDonationDto } from './dto/update-donation.dto';
@@ -6,7 +15,7 @@ import { DonationsQueryDto } from './dto/query/donations.dto';
 
 @Controller('donations')
 export class DonationsController {
-  constructor(private readonly donationsService: DonationsService) { }
+  constructor(private readonly donationsService: DonationsService) {}
 
   @Post()
   create(@Body() createDonationDto: CreateDonationDto) {
@@ -24,7 +33,10 @@ export class DonationsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDonationDto: UpdateDonationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDonationDto: UpdateDonationDto,
+  ) {
     return this.donationsService.update(+id, updateDonationDto);
   }
 

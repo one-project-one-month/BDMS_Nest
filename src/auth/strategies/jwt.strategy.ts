@@ -7,36 +7,40 @@ import { RequestedUser } from 'src/common/interfaces/requested-user.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor(
-        private databaseService: DatabaseService,
-        private appConfig: AppConfigService,
-    ) {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: appConfig.jwtSecret,
-        });
+  constructor(
+    private databaseService: DatabaseService,
+    private appConfig: AppConfigService,
+  ) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: appConfig.jwtSecret,
+    });
+  }
+
+  async validate(payload: {
+    sub: string;
+    user_name: string;
+    role: string;
+  }): Promise<RequestedUser> {
+    const user = await this.databaseService.user.findUnique({
+      where: { id: payload.sub },
+      select: {
+        id: true,
+        user_name: true,
+        role: true,
+        is_active: true,
+      },
+    });
+
+    if (!user || !user.is_active) {
+      throw new UnauthorizedException('User not found or inactive');
     }
 
-    async validate(payload: { sub: string; user_name: string; role: string }): Promise<RequestedUser> {
-        const user = await this.databaseService.user.findUnique({
-            where: { id: payload.sub },
-            select: {
-                id: true,
-                user_name: true,
-                role: true,
-                is_active: true,
-            },
-        });
-
-        if (!user || !user.is_active) {
-            throw new UnauthorizedException('User not found or inactive');
-        }
-
-        return {
-            id: user.id,
-            user_name: user.user_name,
-            role: user.role,
-        };
-    }
+    return {
+      id: user.id,
+      user_name: user.user_name,
+      role: user.role,
+    };
+  }
 }

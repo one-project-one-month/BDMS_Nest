@@ -1,5 +1,5 @@
 export interface RequestedUser {
-    id: string;
-    user_name: string;
-    role: string;
+  id: string;
+  user_name: string;
+  role: string;
 }

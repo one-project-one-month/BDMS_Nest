@@ -4,7 +4,6 @@ import { UpdateCertificateDto } from './dto/update-certificate.dto';
 
 @Injectable()
 export class CertificatesService {
-
   create(createCertificateDto: CreateCertificateDto) {
     return 'This action adds a new certificate';
   }

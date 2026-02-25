@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
@@ -6,7 +15,7 @@ import { RequestsQueryDto } from './dto/query/requests.dto';
 
 @Controller('requests')
 export class RequestsController {
-  constructor(private readonly requestsService: RequestsService) { }
+  constructor(private readonly requestsService: RequestsService) {}
 
   @Post()
   create(@Body() createRequestDto: CreateRequestDto) {
