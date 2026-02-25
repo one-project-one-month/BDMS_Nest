@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { StringValue } from 'ms';
 
 export class AppConfigService {
     constructor(private configService: ConfigService) { }
@@ -26,15 +27,15 @@ export class AppConfigService {
         return this.configService.get<string>('jwt.secret')!;
     }
 
-    get jwtExpiresIn(): string {
-        return this.configService.get<string>('jwt.expiresIn')!;
+    get jwtExpiresIn(): StringValue {
+        return (this.configService.get<string>('jwt.expiresIn') || '7d') as StringValue;
     }
 
     get jwtRefreshSecret(): string {
         return this.configService.get<string>('jwt.refreshSecret')!;
     }
 
-    get jwtRefreshExpiresIn(): string {
-        return this.configService.get<string>('jwt.refreshExpiresIn')!;
+    get jwtRefreshExpiresIn(): StringValue {
+        return (this.configService.get<string>('jwt.refreshExpiresIn') || '30d') as StringValue;
     }
 }

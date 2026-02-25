@@ -57,6 +57,18 @@ enum AppointmentType {
   REQUEST
 }
 
+enum CertificateType {
+  FIRST_TIMER
+  GALLON
+  EMERGENCY
+}
+
+enum TestResult {
+  POSITIVE
+  NEGATIVE
+  PENDING
+}
+
 model User {
   id                 String     @id @default(uuid())
   full_name          String
@@ -76,6 +88,7 @@ model User {
   requests          Request[]     @relation("UserRequests")
   approvedRequests  Request[]     @relation("ApprovedRequests")
   appointments      Appointment[]
+  certificates      Certificate[]
 }
 
 model Donation {
@@ -121,9 +134,10 @@ model Appointment {
   created_at       DateTime          @default(now())
   updated_at       DateTime          @updatedAt
 
-  user     User      @relation(fields: [user_id], references: [id])
-  request  Request?  @relation(fields: [request_id], references: [id])
-  donation Donation? @relation(fields: [donation_id], references: [id])
+  user           User           @relation(fields: [user_id], references: [id])
+  request        Request?       @relation(fields: [request_id], references: [id])
+  donation       Donation?      @relation(fields: [donation_id], references: [id])
+  medical_record MedicalRecord?
 }
 
 model BloodInventory {
@@ -143,4 +157,35 @@ model Announcement {
   expired_at DateTime?
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
+}
+
+model MedicalRecord {
+  id                 String     @id @default(uuid())
+  appointment_id     String     @unique
+  blood_group        String?
+  hemoglobin         String?
+  hiv                Boolean?
+  hepatitis_b        String?
+  hepatitis_c        TestResult @default(PENDING)
+  syphilis           String?
+  malaria            TestResult @default(PENDING)
+  last_donation_date DateTime?
+  is_active          Boolean    @default(true)
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @updatedAt
+
+  appointment Appointment @relation(fields: [appointment_id], references: [id])
+}
+
+model Certificate {
+  id                      String          @id @default(uuid())
+  user_id                 String
+  type                    CertificateType
+  certificate_title       String
+  certificate_description String
+  certificate_date        DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
 }
