@@ -117,6 +117,9 @@ docker-compose down
 
 # Reset database (WARNING: deletes all data)
 npx prisma migrate reset
+
+# Format codes before commit
+pnpm run format
 ```
 
 ---
@@ -194,9 +197,9 @@ git push origin feature/
 
 **Rules:**
 
-- Never push directly to `main`
+- Never push directly to `main` or `dev`
 - Always create a PR and request review from team leader
-- Pull latest `main` before starting new work
+- Pull latest `main` or `dev` before starting new work
 
 ---
 
