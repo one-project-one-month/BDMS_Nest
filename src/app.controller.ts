@@ -6,7 +6,8 @@ import { AppConfigService } from './config/config.helper';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly appConfig: AppConfigService) { }
+    private readonly appConfig: AppConfigService,
+  ) {}
 
   @Get()
   getHello(): string {
@@ -18,7 +19,7 @@ export class AppController {
     return {
       service: this.appConfig.appName,
       version: 'v1.0.0',
-      status: 'OK'
+      status: 'OK',
     };
   }
 }

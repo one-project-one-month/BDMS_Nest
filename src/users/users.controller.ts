@@ -21,7 +21,7 @@ import * as requestedUserInterface from 'src/common/interfaces/requested-user.in
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   // admin only
   @UseGuards(RolesGuard)
@@ -47,7 +47,10 @@ export class UsersController {
 
   // update own profile
   @Patch('me')
-  updateMe(@CurrentUser() user: requestedUserInterface.RequestedUser, @Body() dto: UpdateUserDto) {
+  updateMe(
+    @CurrentUser() user: requestedUserInterface.RequestedUser,
+    @Body() dto: UpdateUserDto,
+  ) {
     return this.usersService.update(user.id, dto);
   }
 

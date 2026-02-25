@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { AnnouncementsService } from './announcements.service';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto';
 import { UpdateAnnouncementDto } from './dto/update-announcement.dto';
@@ -6,7 +15,7 @@ import { AnnouncementsQueryDto } from './dto/query/announcements.dto';
 
 @Controller('announcements')
 export class AnnouncementsController {
-  constructor(private readonly announcementsService: AnnouncementsService) { }
+  constructor(private readonly announcementsService: AnnouncementsService) {}
 
   @Post()
   create(@Body() createAnnouncementDto: CreateAnnouncementDto) {
@@ -24,7 +33,10 @@ export class AnnouncementsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnnouncementDto: UpdateAnnouncementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAnnouncementDto: UpdateAnnouncementDto,
+  ) {
     return this.announcementsService.update(+id, updateAnnouncementDto);
   }
 

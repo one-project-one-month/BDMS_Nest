@@ -13,7 +13,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: DatabaseService) { }
+  constructor(private prisma: DatabaseService) {}
 
   private readonly selectUser: Prisma.UserSelect = {
     id: true,
@@ -101,14 +101,14 @@ export class UsersService {
       this.prisma.user.count({
         where: search
           ? {
-            OR: [
-              { full_name: { contains: search, mode: 'insensitive' } },
-              { user_name: { contains: search, mode: 'insensitive' } },
-            ]
-          }
+              OR: [
+                { full_name: { contains: search, mode: 'insensitive' } },
+                { user_name: { contains: search, mode: 'insensitive' } },
+              ],
+            }
           : {},
       }),
-    ])
+    ]);
 
     return {
       message: 'Users fetched successfully',

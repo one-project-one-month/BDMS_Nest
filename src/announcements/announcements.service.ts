@@ -8,9 +8,7 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AnnouncementsService {
-  constructor(
-    private readonly databaseService: DatabaseService,
-  ) { }
+  constructor(private readonly databaseService: DatabaseService) {}
 
   private readonly selectAnnouncement: Prisma.AnnouncementSelect = {
     id: true,
@@ -29,7 +27,8 @@ export class AnnouncementsService {
 
     const [announcements, totalAnnouncements] = await Promise.all([
       this.databaseService.announcement.findMany({
-        skip, take,
+        skip,
+        take,
         select: this.selectAnnouncement,
       }),
       this.databaseService.announcement.count(),

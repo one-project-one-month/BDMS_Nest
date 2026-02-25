@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
@@ -9,14 +6,13 @@ import { AppConfigService } from '../config/config.helper';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/logint.dto';
 
-
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private appConfig: AppConfigService,
-  ) { }
+  ) {}
 
   async register(dto: RegisterDto) {
     const user = await this.usersService.create(dto);
@@ -44,7 +40,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.generateTokens(user.id, user.user_name, user.role);
+    const tokens = await this.generateTokens(
+      user.id,
+      user.user_name,
+      user.role,
+    );
 
     // TODO: May Be: set refresh token in httpOnly cookie instead of returning in response body
     return {
@@ -65,7 +65,11 @@ export class AuthService {
   async refreshToken(userId: string) {
     const user = await this.usersService.findById(userId);
 
-    const tokens = await this.generateTokens(user.id, user.user_name, user.role);
+    const tokens = await this.generateTokens(
+      user.id,
+      user.user_name,
+      user.role,
+    );
 
     return {
       message: 'Token refreshed successfully',
@@ -77,7 +81,11 @@ export class AuthService {
     return this.usersService.findOne(userId);
   }
 
-  private async generateTokens(userId: string, user_name: string, role: string) {
+  private async generateTokens(
+    userId: string,
+    user_name: string,
+    role: string,
+  ) {
     const payload = { sub: userId, user_name, role };
 
     const [access_token, refresh_token] = await Promise.all([

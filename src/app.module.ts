@@ -24,11 +24,21 @@ import { CertificatesModule } from './certificates/certificates.module';
       validationOptions: {
         allowUnknown: true,
         abortEarly: false, // shows ALL missing vars at once
-      }
+      },
     }),
     AppConfigModule,
-    UsersModule, RequestsModule, DonationsModule, BloodInventoryModule, AppointmentsModule, AnnouncementsModule, AuthModule, DatabaseModule, MedicalRecordsModule, CertificatesModule],
+    UsersModule,
+    RequestsModule,
+    DonationsModule,
+    BloodInventoryModule,
+    AppointmentsModule,
+    AnnouncementsModule,
+    AuthModule,
+    DatabaseModule,
+    MedicalRecordsModule,
+    CertificatesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
