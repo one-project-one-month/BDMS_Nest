@@ -55,7 +55,6 @@ export class AuthService {
           full_name: user.full_name,
           user_name: user.user_name,
           role: user.role,
-          blood_type: user.blood_type,
         },
         ...tokens,
       },
