@@ -75,16 +75,22 @@ You should see `bdms_db` running.
 ### 5. Run Prisma migrations
 
 ```bash
-npx prisma migrate dev --name init
+pnpm run db:migrate
 ```
 
 ### 6. Generate Prisma client
 
 ```bash
-npx prisma generate
+pnpm run db:generate
 ```
 
 ### 7. Start the application
+
+```bash
+pnpm run start
+```
+
+### 8. Start the application in Watch Mode
 
 ```bash
 pnpm run start:dev
@@ -97,20 +103,17 @@ App runs at: `http://localhost:3000`
 ## Useful Commands
 
 ```bash
-# Start in development (watch mode)
-pnpm run start:dev
-
-# Start in production
-pnpm run start
-
 # Run migrations after schema change
 npx prisma migrate dev --name <migration_name>
 
 # Regenerate Prisma client after schema change
-npx prisma generate
+pnpm run db:generate
+
+# Seed data into the database (make sure database container is running before running this command)
+pnpm run db:seed
 
 # Open Prisma Studio (DB GUI)
-npx prisma studio
+pnpm run db:studio
 
 # Stop Docker database
 docker-compose down
