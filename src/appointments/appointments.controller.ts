@@ -24,8 +24,10 @@ export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('appointment.create')
+  create(@Req() req: any, @Body() createAppointmentDto: CreateAppointmentDto) {
+    return this.appointmentsService.create(req.user.sub, createAppointmentDto);
   }
 
   @Get()
