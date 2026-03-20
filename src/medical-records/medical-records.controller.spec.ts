@@ -26,8 +26,9 @@ describe('MedicalRecordsController', () => {
 
   const mockUser = {
     id: 'user-1',
-    email: 'admin@example.com',
-    role_id: 'role-admin-id',
+    user_name: 'admin-user',
+    role: 'admin',
+    permissions: [],
     hospital_id: 'hospital-1',
   };
 
@@ -148,7 +149,6 @@ describe('MedicalRecordsController', () => {
       const queryWithFilters: QueryMedicalRecordsDto = {
         page: 1,
         limit: 10,
-        screening_status: ScreeningStatus.passed,
         search: 'John',
       };
       mockMedicalRecordsService.findAll.mockResolvedValue(paginatedResponse);
