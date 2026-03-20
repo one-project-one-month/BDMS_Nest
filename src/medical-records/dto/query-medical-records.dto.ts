@@ -1,4 +1,4 @@
-import { IsOptional, IsEnum, IsUUID, IsString } from 'class-validator';
+import { IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { ScreeningStatus } from '../../../prisma/generated/enums';
 
@@ -14,8 +14,4 @@ export class QueryMedicalRecordsDto extends PaginationDto {
   @IsOptional()
   @IsUUID()
   donation_id?: string;
-
-  @IsOptional()
-  @IsString()
-  search?: string;
 }
