@@ -33,18 +33,13 @@ When asked to implement features or make changes:
 
 ### Phase 1: Planning
 
-1. **Create plan file** - Generate a detailed plan in session workspace (`~/.copilot/session-state/.../plan.md`) with:
-   - Overview of changes
-   - List of files to create/modify
-   - Step-by-step tasks with clear descriptions
-   - Dependencies between steps
-   - Also create or update `docs/{feature-name}/planning.md` using these required sections:
-     - Feature overview
-     - API design
-     - Data model
-     - Folder structure
-     - Trade-offs
-     - Step-by-step implementation plan
+1. **Create/Update planning doc** - Create or update `docs/{feature-name}/planning.md` using these required sections:
+   - Feature overview
+   - API design
+   - Data model
+   - Folder structure
+   - Trade-offs
+   - Step-by-step implementation plan
 2. **Show plan summary** - Present the plan to user
 3. **Ask for approval** - Wait for confirmation before proceeding
 
@@ -72,7 +67,7 @@ For each step in the plan:
 
 Agents reading this file should:
 
-- Always load and follow the plan from session workspace
+- Always load and follow the plan from `docs/{feature-name}/planning.md`
 - Never skip the permission step between tasks
 - Provide clear diffs or summaries of changes made
 - Respect the commit preference for each step
