@@ -26,3 +26,14 @@ When working on this codebase:
 - Use GSD (Get Shit Done) workflow commands when available
 - Reference codebase docs before planning new features
 - Maintain consistency with established patterns
+
+## Implementation Process
+
+When asked to implement features or make changes:
+
+1. **Show affected files** - List all files that will be created/modified
+2. **Ask for approval** - Wait for user confirmation before proceeding
+3. **Report back** - After implementation, provide summary of:
+   - Files changed
+   - What was implemented
+   - Any issues or considerations
