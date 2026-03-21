@@ -37,6 +37,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<
               typeof data === 'object' && data !== null && 'message' in data
                 ? (data as { message: string }).message
                 : 'Request successful',
+            // TODO: Consider extracting top-level 'meta' property for pagination support
             data:
               typeof data === 'object' && data !== null && 'data' in data
                 ? (data as { data: T }).data
