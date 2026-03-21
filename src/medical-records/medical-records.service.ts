@@ -70,13 +70,18 @@ export class MedicalRecordsService {
       );
     }
 
-    return this.prisma.medicalRecord.create({
+    const result = await this.prisma.medicalRecord.create({
       data: {
         ...createMedicalRecordDto,
         screening_status: ScreeningStatus.pending,
       },
       include: this.includeMedicalRecord,
     });
+
+    return {
+      message: 'Medical record created successfully',
+      data: result,
+    };
   }
 
   async findAll(query: QueryMedicalRecordsDto, userHospitalId?: string) {
@@ -129,7 +134,10 @@ export class MedicalRecordsService {
       this.prisma.medicalRecord.count({ where }),
     ]);
 
-    return paginatedResult(data, total, page, limit);
+    return {
+      message: 'Medical records fetched successfully',
+      data: paginatedResult(data, total, page, limit),
+    };
   }
 
   async findOne(id: string, userHospitalId?: string) {
@@ -152,7 +160,10 @@ export class MedicalRecordsService {
       );
     }
 
-    return record;
+    return {
+      message: 'Medical record fetched successfully',
+      data: record,
+    };
   }
 
   async update(
@@ -160,17 +171,22 @@ export class MedicalRecordsService {
     updateMedicalRecordDto: UpdateMedicalRecordDto,
     userHospitalId?: string,
   ) {
-    const record = await this.findOne(id, userHospitalId);
+    const { data: record } = await this.findOne(id, userHospitalId);
 
-    return this.prisma.medicalRecord.update({
+    const result = await this.prisma.medicalRecord.update({
       where: { id: record.id },
       data: updateMedicalRecordDto,
       include: this.includeMedicalRecord,
     });
+
+    return {
+      message: 'Medical record updated successfully',
+      data: result,
+    };
   }
 
   async approve(id: string, userHospitalId?: string) {
-    const record = await this.findOne(id, userHospitalId);
+    const { data: record } = await this.findOne(id, userHospitalId);
 
     // Business rule: Cannot approve if any test is positive
     const hasPositiveTest =
@@ -186,30 +202,45 @@ export class MedicalRecordsService {
       );
     }
 
-    return this.prisma.medicalRecord.update({
+    const result = await this.prisma.medicalRecord.update({
       where: { id: record.id },
       data: { screening_status: ScreeningStatus.passed },
       include: this.includeMedicalRecord,
     });
+
+    return {
+      message: 'Medical record approved successfully',
+      data: result,
+    };
   }
 
   async reject(id: string, userHospitalId?: string) {
-    const record = await this.findOne(id, userHospitalId);
+    const { data: record } = await this.findOne(id, userHospitalId);
 
-    return this.prisma.medicalRecord.update({
+    const result = await this.prisma.medicalRecord.update({
       where: { id: record.id },
       data: { screening_status: ScreeningStatus.failed },
       include: this.includeMedicalRecord,
     });
+
+    return {
+      message: 'Medical record rejected successfully',
+      data: result,
+    };
   }
 
   async remove(id: string, userHospitalId?: string) {
-    const record = await this.findOne(id, userHospitalId);
+    const { data: record } = await this.findOne(id, userHospitalId);
 
-    return this.prisma.medicalRecord.update({
+    const result = await this.prisma.medicalRecord.update({
       where: { id: record.id },
       data: { deleted_at: new Date() },
       include: this.includeMedicalRecord,
     });
+
+    return {
+      message: 'Medical record deleted successfully',
+      data: result,
+    };
   }
 }
