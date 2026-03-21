@@ -12,11 +12,14 @@ import {
 import {
   ApiTags,
   ApiOperation,
-  ApiResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiNotFoundResponse,
+  ApiConflictResponse,
+  ApiUnprocessableEntityResponse,
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiParam,
-  ApiExtraModels,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { MedicalRecordsService } from './medical-records.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
@@ -30,14 +33,9 @@ import { Roles } from '../auth/decorators/roles.decortor';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import * as requestedUserInterface from '../common/interfaces/requested-user.interface';
 import { MedicalRecordEntity } from './entities/medical-record.entity';
-import {
-  BaseResponseDto,
-  PaginatedResponseDto,
-} from '../common/dto/response.dto';
 
 @ApiTags('Medical Records')
 @ApiBearerAuth('access-token')
-@ApiExtraModels(BaseResponseDto, PaginatedResponseDto, MedicalRecordEntity)
 @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
 @Controller('medical-records')
 export class MedicalRecordsController {
@@ -47,22 +45,12 @@ export class MedicalRecordsController {
   @Permissions('medical.create')
   @Post()
   @ApiOperation({ summary: 'Create a new medical record' })
-  @ApiResponse({
-    status: 201,
+  @ApiCreatedResponse({
     description: 'The medical record has been successfully created.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
-  @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  @ApiResponse({ status: 409, description: 'Donation already has a record.' })
+  @ApiBadRequestResponse({ description: 'Invalid input data.' })
+  @ApiConflictResponse({ description: 'Donation already has a record.' })
   create(
     @Body() createMedicalRecordDto: CreateMedicalRecordDto,
     @CurrentUser() user: requestedUserInterface.RequestedUser,
@@ -74,22 +62,9 @@ export class MedicalRecordsController {
   @Permissions('medical.access')
   @Get()
   @ApiOperation({ summary: 'Retrieve all medical records for the hospital' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'List of medical records retrieved successfully.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(PaginatedResponseDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(MedicalRecordEntity) },
-            },
-          },
-        },
-      ],
-    },
+    type: [MedicalRecordEntity],
   })
   findAll(
     @Query() query: QueryMedicalRecordsDto,
@@ -103,21 +78,11 @@ export class MedicalRecordsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a specific medical record by ID' })
   @ApiParam({ name: 'id', description: 'Medical Record UUID' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Medical record found.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
-  @ApiResponse({ status: 404, description: 'Medical record not found.' })
+  @ApiNotFoundResponse({ description: 'Medical record not found.' })
   findOne(
     @Param('id') id: string,
     @CurrentUser() user: requestedUserInterface.RequestedUser,
@@ -130,21 +95,11 @@ export class MedicalRecordsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update an existing medical record' })
   @ApiParam({ name: 'id', description: 'Medical Record UUID' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Medical record updated successfully.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
-  @ApiResponse({ status: 404, description: 'Medical record not found.' })
+  @ApiNotFoundResponse({ description: 'Medical record not found.' })
   update(
     @Param('id') id: string,
     @Body() updateMedicalRecordDto: UpdateMedicalRecordDto,
@@ -162,22 +117,11 @@ export class MedicalRecordsController {
   @Patch(':id/approve')
   @ApiOperation({ summary: 'Approve a medical record' })
   @ApiParam({ name: 'id', description: 'Medical Record UUID' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Medical record approved.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
-  @ApiResponse({
-    status: 422,
+  @ApiUnprocessableEntityResponse({
     description: 'Cannot approve record with positive test results.',
   })
   approve(
@@ -192,19 +136,9 @@ export class MedicalRecordsController {
   @Patch(':id/reject')
   @ApiOperation({ summary: 'Reject a medical record' })
   @ApiParam({ name: 'id', description: 'Medical Record UUID' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Medical record rejected.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
   reject(
     @Param('id') id: string,
@@ -218,19 +152,9 @@ export class MedicalRecordsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a medical record (Soft Delete)' })
   @ApiParam({ name: 'id', description: 'Medical Record UUID' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Medical record deleted successfully.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(BaseResponseDto) },
-        {
-          properties: {
-            data: { $ref: getSchemaPath(MedicalRecordEntity) },
-          },
-        },
-      ],
-    },
+    type: MedicalRecordEntity,
   })
   remove(
     @Param('id') id: string,
