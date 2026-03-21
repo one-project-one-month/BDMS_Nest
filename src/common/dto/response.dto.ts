@@ -24,6 +24,7 @@ export class PaginatedResponseDto<T> extends BaseResponseDto<T[]> {
       page: 1,
       limit: 10,
       totalPages: 10,
+      hasNextPage: true,
     },
   })
   meta?: {
@@ -31,5 +32,6 @@ export class PaginatedResponseDto<T> extends BaseResponseDto<T[]> {
     page: number;
     limit: number;
     totalPages: number;
+    hasNextPage: boolean;
   };
 }
