@@ -61,3 +61,28 @@ export class MedicalRecordEntity {
   @ApiProperty({ example: null, required: false, nullable: true })
   deleted_at: Date | null;
 }
+
+class MedicalRecordPaginationMeta {
+  @ApiProperty({ example: 100 })
+  total: number;
+
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 10 })
+  limit: number;
+
+  @ApiProperty({ example: 10 })
+  totalPages: number;
+
+  @ApiProperty({ example: true })
+  hasNextPage: boolean;
+}
+
+export class PaginatedMedicalRecordEntity {
+  @ApiProperty({ type: [MedicalRecordEntity] })
+  data: MedicalRecordEntity[];
+
+  @ApiProperty({ type: MedicalRecordPaginationMeta })
+  meta: MedicalRecordPaginationMeta;
+}
