@@ -38,7 +38,7 @@ import {
   AuthUserProfileResponseDataDto,
   MessageResponseDto,
 } from './dto/auth-responses.dto';
-import * as requestedUserInterface from '../common/interfaces/requested-user.interface';
+import * as requestedUserInterface from 'src/common/interfaces/requested-user.interface';
 import { AppConfigService } from '../config/config.helper';
 
 @ApiTags('auth')
@@ -203,9 +203,11 @@ export class AuthController {
     );
     const { access_token, refresh_token } = authResult.data;
 
-    const frontendUrl = this.appConfig.frontendUrl || 'http://localhost:3001';
+    const frontendUrl =
+      this.appConfig.frontendOauthCallbackUrl ||
+      'http://localhost:3001/oauth-success';
     return res.redirect(
-      `${frontendUrl}/oauth-success?access_token=${access_token}&refresh_token=${refresh_token}`,
+      `${frontendUrl}?access_token=${access_token}&refresh_token=${refresh_token}`,
     );
   }
 

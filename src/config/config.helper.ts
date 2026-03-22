@@ -63,8 +63,8 @@ export class AppConfigService {
     return this.configService.get<string>('google.callbackUrl');
   }
 
-  get frontendUrl(): string | undefined {
-    return this.configService.get<string>('google.frontendUrl');
+  get frontendOauthCallbackUrl(): string | undefined {
+    return this.configService.get<string>('google.frontendCallbackUrl');
   }
 
   // Resend (Email)
