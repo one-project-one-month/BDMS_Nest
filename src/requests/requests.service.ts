@@ -104,13 +104,8 @@ export class RequestsService {
     };
   }
 
-  async findOne(id: string, userId: string, hospitalId: string, role: string) {
-    const isAdminOrStaff = ['ADMIN', 'STAFF'].includes(role); // ADMIN and STAFF can view all requests.
-
-    await this.findRequestOrThrow(id, {
-      hospitalId,
-      userId: isAdminOrStaff ? undefined : userId,
-    });
+  async findOne(id: string, hospitalId?: string) {
+    await this.findRequestOrThrow(id, { hospitalId });
 
     const request = await this.requestsRepo.findById(id);
     return {
