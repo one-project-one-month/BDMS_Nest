@@ -1,5 +1,15 @@
 import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { Type } from 'class-transformer';
+import { IsEnum, IsOptional, IsPositive } from 'class-validator';
+import { InventoryStatus } from '../../../../prisma/generated/client';
 
 export class BloodInventoryQueryDto extends PaginationDto {
-  // Add any additional query parameters specific to blood inventory here
+  @IsOptional()
+  @IsEnum(InventoryStatus)
+  status?: InventoryStatus;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsPositive()
+  per_page?: number;
 }
