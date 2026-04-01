@@ -1,9 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
+import { RedisService } from '../common/services/redis.service';
 
 @Injectable()
 export class HospitalsService {
-  constructor(private readonly prisma: DatabaseService) {}
+  private readonly logger = new Logger(HospitalsService.name);
+  private readonly CACHE_KEY = 'hospitals:list';
+  private readonly CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
+
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly redis: RedisService,
+  ) {}
 
   async findAll() {
     // 1. Check cache
@@ -39,11 +47,6 @@ export class HospitalsService {
         name: 'asc',
       },
     });
-    return {
-      message: 'Hospitals fetched successfully',
-      data: hospitals,
-    };
-  }
 
     const response = {
       messages: 'Fetched hospitals successfully',
