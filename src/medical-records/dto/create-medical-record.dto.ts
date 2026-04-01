@@ -14,7 +14,7 @@ import {
   TestResult,
   ScreeningStatus,
   BloodGroup,
-} from '../../../prisma/generated/enums';
+} from '../../../prisma/generated/client';
 
 export class CreateMedicalRecordDto {
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174001' })
