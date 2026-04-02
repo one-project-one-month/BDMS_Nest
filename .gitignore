@@ -57,3 +57,10 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Prisma generated client
 prisma/generated/
+
+# OpenCode configuration (local only)
+.opencode/
+
+# Project specific (do not commit)
+AGENTS.md
+docs/
