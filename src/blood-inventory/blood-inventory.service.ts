@@ -8,7 +8,7 @@ import {
   DonationStatus,
   InventoryStatus,
   Prisma,
-} from '../../prisma/generated/client';
+} from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import { CreateBloodInventoryDto } from './dto/create-blood-inventory.dto';
 import { UseFromInventoryDto } from './dto/update-blood-inventory.dto';

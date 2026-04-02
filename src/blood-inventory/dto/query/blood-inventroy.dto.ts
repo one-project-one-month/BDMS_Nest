@@ -1,9 +1,6 @@
 import { PaginationDto } from '../../../common/dto/pagination.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  BloodGroup,
-  InventoryStatus,
-} from '../../../../prisma/generated/client';
+import { BloodGroup, InventoryStatus } from '@prisma/client';
 import { IsBooleanString, IsEnum, IsOptional, IsUUID } from 'class-validator';
 
 export class BloodInventoryQueryDto extends PaginationDto {

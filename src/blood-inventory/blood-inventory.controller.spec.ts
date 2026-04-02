@@ -8,7 +8,12 @@ describe('BloodInventoryController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BloodInventoryController],
-      providers: [BloodInventoryService],
+      providers: [
+        {
+          provide: BloodInventoryService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     controller = module.get<BloodInventoryController>(BloodInventoryController);
