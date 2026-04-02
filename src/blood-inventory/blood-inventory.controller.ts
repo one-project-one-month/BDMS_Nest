@@ -11,12 +11,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BloodGroup } from '../../prisma/generated/client';
+import { BloodGroup } from '@prisma/client';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { BloodInventoryService } from './blood-inventory.service';
-import { CreateBloodInventoryDto } from './dto/create-blood-inventory.dto';
 import { UseFromInventoryDto } from './dto/update-blood-inventory.dto';
 import { BloodInventoryQueryDto } from './dto/query/blood-inventroy.dto';
 
@@ -26,16 +25,9 @@ import { BloodInventoryQueryDto } from './dto/query/blood-inventroy.dto';
 export class BloodInventoryController {
   constructor(private readonly bloodInventoryService: BloodInventoryService) {}
 
-  @ApiOperation({ summary: 'Add a completed donation into inventory' })
-  @Permissions('inventory.create')
-  @Post()
-  addToInventory(@Body() createBloodInventoryDto: CreateBloodInventoryDto) {
-    return this.bloodInventoryService.addToInventory(createBloodInventoryDto);
-  }
-
-  @ApiOperation({ summary: 'Get blood inventory list with optional filters' })
+  @ApiOperation({ summary: 'Get all blood inventory' })
   @Permissions('inventory.access')
-  @Get()
+  @Get('list')
   findAll(@Query() query: BloodInventoryQueryDto) {
     return this.bloodInventoryService.findAll(query);
   }
@@ -46,8 +38,8 @@ export class BloodInventoryController {
   @Permissions('inventory.view')
   @Get('available-stock')
   getAvailableStock(
-    @Query('hospital_id') hospitalId?: string,
-    @Query('blood_group') bloodGroup?: BloodGroup,
+    @Query('hospitalId') hospitalId?: string,
+    @Query('bloodGroup') bloodGroup?: BloodGroup,
   ) {
     return this.bloodInventoryService.getAvailableStock(hospitalId, bloodGroup);
   }
@@ -66,6 +58,15 @@ export class BloodInventoryController {
     return this.bloodInventoryService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Add donation to blood inventory' })
+  @Permissions('inventory.create')
+  @Post('add/:donationId')
+  addToInventory(@Param('donationId', ParseUUIDPipe) donationId: string) {
+    return this.bloodInventoryService.addToInventory({
+      donation_id: donationId,
+    });
+  }
+
   @ApiOperation({ summary: 'Mark inventory unit as used for a blood request' })
   @Permissions('inventory.update')
   @Patch('use')
@@ -75,8 +76,8 @@ export class BloodInventoryController {
 
   @ApiOperation({ summary: 'Run stock take and mark expired available units' })
   @Permissions('inventory.manage')
-  @Patch('stock-take')
-  runStockTake(@Query('hospital_id') hospitalId?: string) {
+  @Post('stock-take')
+  runStockTake(@Query('hospitalId') hospitalId?: string) {
     return this.bloodInventoryService.runStockTake(hospitalId);
   }
 
