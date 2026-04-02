@@ -1,38 +1,11 @@
-import {
-  IsDateString,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsPositive,
-  IsUUID,
-} from 'class-validator';
-import { BloodGroup, InventoryStatus } from '../../../prisma/generated/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 
 export class CreateBloodInventoryDto {
+  @ApiProperty({
+    description: 'Donation id to convert into an inventory record',
+    example: '6c89ea39-7673-4e0e-9188-742d58a60550',
+  })
   @IsUUID()
   donation_id: string;
-
-  @IsUUID()
-  hospital_id: string;
-
-  @IsEnum(BloodGroup)
-  blood_group: BloodGroup;
-
-  @IsInt()
-  @IsPositive()
-  units: number;
-
-  @IsDateString()
-  collected_at: string;
-
-  @IsDateString()
-  expired_at: string;
-
-  @IsOptional()
-  @IsEnum(InventoryStatus)
-  status?: InventoryStatus;
-
-  @IsOptional()
-  @IsUUID()
-  blood_request_id?: string;
 }

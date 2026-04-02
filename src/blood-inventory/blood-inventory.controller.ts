@@ -5,109 +5,85 @@ import {
   Body,
   Patch,
   Param,
-  Put,
+  Delete,
+  ParseUUIDPipe,
   Query,
   UseGuards,
-  ForbiddenException,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { BloodInventoryService } from './blood-inventory.service';
-import { CreateBloodInventoryDto } from './dto/create-blood-inventory.dto';
-import { UpdateBloodInventoryDto } from './dto/update-blood-inventory.dto';
-import { BloodInventoryQueryDto } from './dto/query/blood-inventroy.dto';
-import { MarkUsedBloodInventoryDto } from './dto/mark-used-blood-inventory.dto';
+import { BloodGroup } from '../../prisma/generated/client';
+import { Permissions } from '../auth/decorators/permissions.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Permissions } from '../auth/decorators/permissions.decorator';
-import { Roles } from '../auth/decorators/roles.decortor';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { RequestedUser } from '../common/interfaces/requested-user.interface';
+import { BloodInventoryService } from './blood-inventory.service';
+import { CreateBloodInventoryDto } from './dto/create-blood-inventory.dto';
+import { UseFromInventoryDto } from './dto/update-blood-inventory.dto';
+import { BloodInventoryQueryDto } from './dto/query/blood-inventroy.dto';
 
-@ApiTags('blood-inventories')
+@ApiTags('blood-inventory')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
-@Controller('blood-inventories')
+@Controller('blood-inventory')
 export class BloodInventoryController {
   constructor(private readonly bloodInventoryService: BloodInventoryService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create blood inventory item' })
+  @ApiOperation({ summary: 'Add a completed donation into inventory' })
   @Permissions('inventory.create')
-  create(
-    @CurrentUser() user: RequestedUser,
-    @Body() createBloodInventoryDto: CreateBloodInventoryDto,
-  ) {
-    if (!user.hospital_id) {
-      throw new ForbiddenException('You are not assigned to any hospital');
-    }
-
-    return this.bloodInventoryService.create(createBloodInventoryDto, user);
+  @Post()
+  addToInventory(@Body() createBloodInventoryDto: CreateBloodInventoryDto) {
+    return this.bloodInventoryService.addToInventory(createBloodInventoryDto);
   }
 
+  @ApiOperation({ summary: 'Get blood inventory list with optional filters' })
+  @Permissions('inventory.access')
   @Get()
+  findAll(@Query() query: BloodInventoryQueryDto) {
+    return this.bloodInventoryService.findAll(query);
+  }
+
   @ApiOperation({
-    summary: 'List blood inventories with grouping and pagination',
+    summary: 'Get available stock summary by hospital/blood group',
   })
   @Permissions('inventory.view')
-  findAll(
-    @CurrentUser() user: RequestedUser,
-    @Query() query: BloodInventoryQueryDto,
+  @Get('available-stock')
+  getAvailableStock(
+    @Query('hospital_id') hospitalId?: string,
+    @Query('blood_group') bloodGroup?: BloodGroup,
   ) {
-    if (!user.hospital_id) {
-      throw new ForbiddenException('You are not assigned to any hospital');
-    }
-
-    return this.bloodInventoryService.findAll(query, user.hospital_id);
+    return this.bloodInventoryService.getAvailableStock(hospitalId, bloodGroup);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get blood inventory by ID' })
+  @ApiOperation({ summary: 'Get inventory records by hospital' })
   @Permissions('inventory.view')
-  findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: RequestedUser,
-  ) {
-    if (!user.hospital_id) {
-      throw new ForbiddenException('You are not assigned to any hospital');
-    }
-
-    return this.bloodInventoryService.findOne(id, user.hospital_id);
+  @Get('hospital/:hospitalId')
+  findByHospital(@Param('hospitalId', ParseUUIDPipe) hospitalId: string) {
+    return this.bloodInventoryService.findByHospital(hospitalId);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update blood inventory by ID' })
+  @ApiOperation({ summary: 'Get inventory item by id' })
+  @Permissions('inventory.view')
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.bloodInventoryService.findOne(id);
+  }
+
+  @ApiOperation({ summary: 'Mark inventory unit as used for a blood request' })
   @Permissions('inventory.update')
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: RequestedUser,
-    @Body() updateBloodInventoryDto: UpdateBloodInventoryDto,
-  ) {
-    if (!user.hospital_id) {
-      throw new ForbiddenException('You are not assigned to any hospital');
-    }
-
-    return this.bloodInventoryService.update(
-      id,
-      updateBloodInventoryDto,
-      user.hospital_id,
-    );
+  @Patch('use')
+  useFromInventory(@Body() useFromInventoryDto: UseFromInventoryDto) {
+    return this.bloodInventoryService.useFromInventory(useFromInventoryDto);
   }
 
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN', 'STAFF')
-  @Put(':id/used')
-  @ApiOperation({ summary: 'Mark blood inventory as used' })
+  @ApiOperation({ summary: 'Run stock take and mark expired available units' })
   @Permissions('inventory.manage')
-  markUsed(
-    @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: RequestedUser,
-    @Body() dto: MarkUsedBloodInventoryDto,
-  ) {
-    if (!user.hospital_id) {
-      throw new ForbiddenException('You are not assigned to any hospital');
-    }
+  @Patch('stock-take')
+  runStockTake(@Query('hospital_id') hospitalId?: string) {
+    return this.bloodInventoryService.runStockTake(hospitalId);
+  }
 
-    return this.bloodInventoryService.markUsed(id, dto, user.hospital_id);
+  @ApiOperation({ summary: 'Soft delete inventory item' })
+  @Permissions('inventory.delete')
+  @Delete(':id')
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.bloodInventoryService.remove(id);
   }
 }
