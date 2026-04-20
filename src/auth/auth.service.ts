@@ -220,9 +220,6 @@ export class AuthService {
           email: user.email,
           role: user.role.name,
           hospital_id: user.hospital_id,
-          permissions: user.role.role_permissions.map(
-            (rp) => rp.permission.name,
-          ),
         },
         ...tokens,
       },
