@@ -38,6 +38,7 @@ export default tseslint.config(
     plugins: { jest: jestPlugin },
     rules: {
       "@typescript-eslint/unbound-method": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
       "jest/unbound-method": "error",
     },
   },

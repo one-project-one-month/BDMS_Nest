@@ -45,10 +45,7 @@ export class MedicalRecordsController {
     description: 'The medical record has been successfully created.',
     type: MedicalRecordEntity,
   })
-  create(
-    @Body() createMedicalRecordDto: CreateMedicalRecordDto,
-    @CurrentUser() user: requestedUserInterface.RequestedUser,
-  ) {
+  create(@Body() createMedicalRecordDto: CreateMedicalRecordDto) {
     return this.medicalRecordsService.create(createMedicalRecordDto);
   }
 

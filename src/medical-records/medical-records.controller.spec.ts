@@ -8,7 +8,7 @@ import {
   ScreeningStatus,
   TestResult,
   BloodGroup,
-} from '../../prisma/generated/enums';
+} from '../../prisma/generated/client';
 
 describe('MedicalRecordsController', () => {
   let controller: MedicalRecordsController;

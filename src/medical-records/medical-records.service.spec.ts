@@ -14,11 +14,10 @@ import {
   ScreeningStatus,
   TestResult,
   BloodGroup,
-} from '../../prisma/generated/enums';
+} from '../../prisma/generated/client';
 
 describe('MedicalRecordsService', () => {
   let service: MedicalRecordsService;
-  let databaseService: DatabaseService;
 
   const mockDatabaseService = {
     medicalRecord: {
@@ -71,7 +70,6 @@ describe('MedicalRecordsService', () => {
     }).compile();
 
     service = module.get<MedicalRecordsService>(MedicalRecordsService);
-    databaseService = module.get<DatabaseService>(DatabaseService);
 
     jest.clearAllMocks();
   });
