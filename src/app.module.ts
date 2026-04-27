@@ -12,10 +12,13 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import appConfig, { validationSchema } from './config/app.config';
 import { AppConfigModule } from './config/module.config';
+import { AppConfigService } from './config/config.helper';
 import { MedicalRecordsModule } from './medical-records/medical-records.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { MailModule } from './mail/mail.module';
 import { HospitalsModule } from './hospitals/hospitals.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -25,10 +28,17 @@ import { HospitalsModule } from './hospitals/hospitals.module';
       validationSchema,
       validationOptions: {
         allowUnknown: true,
-        abortEarly: false, // shows ALL missing vars at once
+        abortEarly: false,
       },
     }),
     AppConfigModule,
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [AppConfigService],
+      useFactory: (config: AppConfigService) => ({
+        stores: config.redisUrl ? [new KeyvRedis(config.redisUrl)] : [],
+      }),
+    }),
     MailModule,
     UsersModule,
     RequestsModule,

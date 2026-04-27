@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Inject,
   UnauthorizedException,
   InternalServerErrorException,
   BadRequestException,
@@ -13,7 +14,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from '../mail/mail.service';
-import { RedisService } from '../common/services/redis.service';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as crypto from 'crypto';
@@ -22,6 +23,8 @@ import * as crypto from 'crypto';
 export class AuthService {
   private readonly RESET_PASSWORD_PREFIX = 'reset-password:';
   private readonly VERIFY_EMAIL_PREFIX = 'verify-email:';
+  private readonly VERIFY_EMAIL_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly RESET_PASSWORD_TTL_MS = 60 * 60 * 1000; // 1 hour
 
   constructor(
     private usersService: UsersService,
@@ -29,7 +32,7 @@ export class AuthService {
     private appConfig: AppConfigService,
     private tokenBlacklistService: TokenBlacklistService,
     private mailService: MailService,
-    private redisService: RedisService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -94,8 +97,11 @@ export class AuthService {
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verifyKey = `${this.VERIFY_EMAIL_PREFIX}${verificationToken}`;
 
-    // Store email:hospital_id in Redis with 24 hours TTL
-    await this.redisService.set(verifyKey, `${email}:${hospital_id}`, 86400);
+    await this.cache.set(
+      verifyKey,
+      `${email}:${hospital_id}`,
+      this.VERIFY_EMAIL_TTL_MS,
+    );
 
     // TODO: Link to frontend verification page
     const verifyLink = `http://localhost:3001/verify-email?token=${verificationToken}`;
@@ -105,7 +111,7 @@ export class AuthService {
 
   async verifyEmail(token: string) {
     const verifyKey = `${this.VERIFY_EMAIL_PREFIX}${token}`;
-    const value = await this.redisService.get(verifyKey);
+    const value = await this.cache.get<string>(verifyKey);
 
     if (!value) {
       throw new BadRequestException('Invalid or expired verification token');
@@ -130,7 +136,7 @@ export class AuthService {
     });
 
     // Delete token after successful verification
-    await this.redisService.del(verifyKey);
+    await this.cache.del(verifyKey);
 
     // Send welcome email after verification
     void this.mailService.sendWelcomeEmail(user.email, user.user_name);
@@ -348,11 +354,10 @@ export class AuthService {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetKey = `${this.RESET_PASSWORD_PREFIX}${resetToken}`;
 
-    // Store email:hospital_id in Redis with 1 hour TTL
-    await this.redisService.set(
+    await this.cache.set(
       resetKey,
       `${user.email}:${user.hospital_id}`,
-      3600,
+      this.RESET_PASSWORD_TTL_MS,
     );
 
     const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;
@@ -372,7 +377,7 @@ export class AuthService {
 
   async resetPassword(dto: ResetPasswordDto) {
     const resetKey = `${this.RESET_PASSWORD_PREFIX}${dto.token}`;
-    const value = await this.redisService.get(resetKey);
+    const value = await this.cache.get<string>(resetKey);
 
     if (!value) {
       throw new BadRequestException('Invalid or expired reset token');
@@ -391,7 +396,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
     await this.usersService.updatePassword(user.id, hashedPassword);
 
-    await this.redisService.del(resetKey);
+    await this.cache.del(resetKey);
 
     return {
       message: 'Password has been reset successfully',

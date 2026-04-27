@@ -9,7 +9,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { TokenBlacklistService } from './token-blacklist.service';
 import { UsersModule } from '../users/users.module';
 import { AppConfigService } from '../config/config.helper';
-import { RedisService } from '../common/services/redis.service';
 
 @Module({
   imports: [
@@ -30,7 +29,6 @@ import { RedisService } from '../common/services/redis.service';
     JwtRefreshStrategy,
     GoogleStrategy,
     TokenBlacklistService,
-    RedisService,
   ],
   exports: [AuthService, JwtModule],
 })

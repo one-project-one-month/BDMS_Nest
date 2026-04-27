@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '../config/config.helper';
 import { TokenBlacklistService } from './token-blacklist.service';
 import { MailService } from '../mail/mail.service';
-import { RedisService } from '../common/services/redis.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -47,7 +47,7 @@ describe('AuthService', () => {
     sendWelcomeEmail: jest.Mock;
     sendPasswordResetEmail: jest.Mock;
   };
-  let redisService: {
+  let cacheManager: {
     set: jest.Mock;
     get: jest.Mock;
     del: jest.Mock;
@@ -86,7 +86,7 @@ describe('AuthService', () => {
       sendPasswordResetEmail: jest.fn(),
     };
 
-    redisService = {
+    cacheManager = {
       set: jest.fn(),
       get: jest.fn(),
       del: jest.fn(),
@@ -121,8 +121,8 @@ describe('AuthService', () => {
           useValue: mailService,
         },
         {
-          provide: RedisService,
-          useValue: redisService,
+          provide: CACHE_MANAGER,
+          useValue: cacheManager,
         },
       ],
     }).compile();
@@ -177,10 +177,10 @@ describe('AuthService', () => {
         role_id: 'role-user-id',
         hospital_id: 'hosp-1',
       });
-      expect(redisService.set).toHaveBeenCalledWith(
+      expect(cacheManager.set).toHaveBeenCalledWith(
         expect.stringContaining('verify-email:'),
         'john@example.com:hosp-1',
-        86400,
+        24 * 60 * 60 * 1000,
       );
       expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
       expect(result.data).toEqual({
@@ -209,7 +209,7 @@ describe('AuthService', () => {
 
   describe('verifyEmail', () => {
     it('should throw for invalid/expired token', async () => {
-      redisService.get.mockResolvedValue(null);
+      cacheManager.get.mockResolvedValue(null);
 
       await expect(service.verifyEmail('bad-token')).rejects.toBeInstanceOf(
         BadRequestException,
@@ -217,7 +217,7 @@ describe('AuthService', () => {
     });
 
     it('should return already verified message', async () => {
-      redisService.get.mockResolvedValue('john@example.com:hosp-1');
+      cacheManager.get.mockResolvedValue('john@example.com:hosp-1');
       usersService.findByEmailInternal.mockResolvedValue({
         id: 'user-1',
         email_verified_at: new Date(),
@@ -259,7 +259,7 @@ describe('AuthService', () => {
     });
 
     it('resetPassword should hash password and delete reset key', async () => {
-      redisService.get.mockResolvedValue('john@example.com:hosp-1');
+      cacheManager.get.mockResolvedValue('john@example.com:hosp-1');
       usersService.findByEmailInternal.mockResolvedValue({
         id: 'user-1',
         email: 'john@example.com',
@@ -276,7 +276,7 @@ describe('AuthService', () => {
         'user-1',
         'new-hash',
       );
-      expect(redisService.del).toHaveBeenCalledWith(
+      expect(cacheManager.del).toHaveBeenCalledWith(
         'reset-password:reset-token',
       );
       expect(result).toEqual({
