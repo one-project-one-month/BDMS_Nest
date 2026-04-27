@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
-import { ScreeningStatus } from '../../../prisma/generated/client';
+import { ScreeningStatus } from '@prisma/client';
 
 export class QueryMedicalRecordsDto extends PaginationDto {
   @ApiPropertyOptional({

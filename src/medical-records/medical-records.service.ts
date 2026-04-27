@@ -9,11 +9,7 @@ import { DatabaseService } from '../database/database.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { UpdateMedicalRecordDto } from './dto/update-medical-record.dto';
 import { QueryMedicalRecordsDto } from './dto/query-medical-records.dto';
-import {
-  Prisma,
-  ScreeningStatus,
-  TestResult,
-} from '../../prisma/generated/client';
+import { Prisma, ScreeningStatus, TestResult } from '@prisma/client';
 import { paginate, paginatedResult } from '../common/helpers/paginate.helper';
 
 @Injectable()

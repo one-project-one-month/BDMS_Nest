@@ -4,11 +4,7 @@ import { MedicalRecordsService } from './medical-records.service';
 import { CreateMedicalRecordDto } from './dto/create-medical-record.dto';
 import { UpdateMedicalRecordDto } from './dto/update-medical-record.dto';
 import { QueryMedicalRecordsDto } from './dto/query-medical-records.dto';
-import {
-  ScreeningStatus,
-  TestResult,
-  BloodGroup,
-} from '../../prisma/generated/client';
+import { ScreeningStatus, TestResult, BloodGroup } from '@prisma/client';
 
 describe('MedicalRecordsController', () => {
   let controller: MedicalRecordsController;
