@@ -1,29 +1,27 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { DatabaseService } from '../database/database.service';
-import { RedisService } from '../common/services/redis.service';
 
 @Injectable()
 export class HospitalsService {
   private readonly logger = new Logger(HospitalsService.name);
   private readonly CACHE_KEY = 'hospitals:list';
-  private readonly CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
+  private readonly CACHE_TTL = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly redis: RedisService,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) {}
 
   async findAll() {
     // 1. Check cache
     try {
-      const cachedStr = await this.redis.get(this.CACHE_KEY);
-      if (cachedStr) {
+      const cached = await this.cache.get<{ messages: string; data: any[] }>(
+        this.CACHE_KEY,
+      );
+      if (cached) {
         this.logger.debug('Returning hospitals from cache');
-        const cachedData = JSON.parse(cachedStr) as {
-          messages: string;
-          data: any[];
-        };
-        return cachedData;
+        return cached;
       }
     } catch (e) {
       this.logger.warn('Failed to read hospitals from cache', e);
@@ -55,11 +53,7 @@ export class HospitalsService {
 
     // 3. Save to cache
     try {
-      await this.redis.set(
-        this.CACHE_KEY,
-        JSON.stringify(response),
-        this.CACHE_TTL,
-      );
+      await this.cache.set(this.CACHE_KEY, response, this.CACHE_TTL);
     } catch (e) {
       this.logger.warn('Failed to save hospitals to cache', e);
     }
