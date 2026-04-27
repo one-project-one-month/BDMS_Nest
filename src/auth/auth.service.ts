@@ -23,6 +23,8 @@ import * as crypto from 'crypto';
 export class AuthService {
   private readonly RESET_PASSWORD_PREFIX = 'reset-password:';
   private readonly VERIFY_EMAIL_PREFIX = 'verify-email:';
+  private readonly VERIFY_EMAIL_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly RESET_PASSWORD_TTL_MS = 60 * 60 * 1000; // 1 hour
 
   constructor(
     private usersService: UsersService,
@@ -95,7 +97,11 @@ export class AuthService {
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verifyKey = `${this.VERIFY_EMAIL_PREFIX}${verificationToken}`;
 
-    await this.cache.set(verifyKey, `${email}:${hospital_id}`, 86_400_000);
+    await this.cache.set(
+      verifyKey,
+      `${email}:${hospital_id}`,
+      this.VERIFY_EMAIL_TTL_MS,
+    );
 
     // TODO: Link to frontend verification page
     const verifyLink = `http://localhost:3001/verify-email?token=${verificationToken}`;
@@ -351,7 +357,7 @@ export class AuthService {
     await this.cache.set(
       resetKey,
       `${user.email}:${user.hospital_id}`,
-      3_600_000,
+      this.RESET_PASSWORD_TTL_MS,
     );
 
     const resetLink = `http://localhost:3001/reset-password?token=${resetToken}`;

@@ -180,7 +180,7 @@ describe('AuthService', () => {
       expect(cacheManager.set).toHaveBeenCalledWith(
         expect.stringContaining('verify-email:'),
         'john@example.com:hosp-1',
-        86_400_000,
+        24 * 60 * 60 * 1000,
       );
       expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
       expect(result.data).toEqual({
