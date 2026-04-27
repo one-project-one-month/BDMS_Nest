@@ -230,85 +230,45 @@ describe('RequestsService', () => {
 
   // --- findOne ---
   describe('find one', () => {
-    const mockId = 'request-123';
-    const userId = 'user-123';
-    const userId2 = 'user-1234';
-    const hospId = 'hosp-1';
-    const hospId2 = 'hosp-2';
-    const userRole = 'USER';
-    const adminRole = 'ADMIN';
-
     // Happy path
     it('should return a specific request by id', async () => {
       const mockRequest = {
-        id: mockId,
-        user_id: userId,
+        id: 'request-123',
         status: RequestStatus.pending,
-        hospital_id: hospId,
+        hospital_id: 'hosp-1',
       };
       // findRequestOrThrow uses findByIdWithoutSelect internally
       mockRequestsRepo.findByIdWithoutSelect.mockResolvedValue(mockRequest);
       mockRequestsRepo.findById.mockResolvedValue(mockRequest);
 
-      const result = await service.findOne(mockId, userId, hospId, userRole);
+      const result = await service.findOne('request-123', 'hosp-1');
 
-      expect(repo.findByIdWithoutSelect).toHaveBeenCalledWith(mockId);
-      expect(repo.findById).toHaveBeenCalledWith(mockId);
+      expect(repo.findByIdWithoutSelect).toHaveBeenCalledWith('request-123');
+      expect(repo.findById).toHaveBeenCalledWith('request-123');
       expect(result.message).toBe('Request fetched successfully');
       expect(result.data).toEqual(mockRequest);
-    });
-
-    // Admin can see others' requests
-    it('should allow admin to see requests not owned by them', async () => {
-      const mockRequest = {
-        id: mockId,
-        user_id: userId2,
-        status: RequestStatus.pending,
-        hospital_id: hospId,
-      };
-      mockRequestsRepo.findByIdWithoutSelect.mockResolvedValue(mockRequest);
-      mockRequestsRepo.findById.mockResolvedValue(mockRequest);
-
-      const result = await service.findOne(mockId, userId, hospId, adminRole);
-
-      expect(result.data).toEqual(mockRequest);
-      expect(repo.findByIdWithoutSelect).toHaveBeenCalled();
     });
 
     // Not found -> throw
     it('should throw NotFoundException if request is not found', async () => {
       mockRequestsRepo.findByIdWithoutSelect.mockResolvedValue(null);
 
-      await expect(
-        service.findOne(mockId, userId, hospId, userRole),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('request-123', 'hosp-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     // Wrong hospital -> throw
     it('should throw NotFoundException if request belongs to another hospital', async () => {
       mockRequestsRepo.findByIdWithoutSelect.mockResolvedValue({
-        id: mockId,
+        id: 'request-123',
         status: RequestStatus.pending,
-        hospital_id: hospId2, // mismatch
+        hospital_id: 'hosp-2', // mismatch
       });
 
-      await expect(
-        service.findOne(mockId, userId, hospId, userRole),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    // Wrong user-id -> throw
-    it('should throw Blood Request Not Found if user is not authorized to view the request', async () => {
-      mockRequestsRepo.findByIdWithoutSelect.mockResolvedValue({
-        id: mockId,
-        user_id: userId2, // mismatch
-        status: RequestStatus.pending,
-        hospital_id: hospId,
-      });
-
-      await expect(
-        service.findOne(mockId, userId, hospId, userRole),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('request-123', 'hosp-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

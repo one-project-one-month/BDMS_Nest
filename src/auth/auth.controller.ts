@@ -38,7 +38,7 @@ import {
   AuthUserProfileResponseDataDto,
   MessageResponseDto,
 } from './dto/auth-responses.dto';
-import * as requestedUserInterface from '../common/interfaces/requested-user.interface';
+import * as requestedUserInterface from 'src/common/interfaces/requested-user.interface';
 import { AppConfigService } from '../config/config.helper';
 
 @ApiTags('auth')

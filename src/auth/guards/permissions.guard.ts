@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
-import * as requestedUserInterface from '../../common/interfaces/requested-user.interface';
+import { RequestedUser } from '../../common/interfaces/requested-user.interface';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -24,7 +24,7 @@ export class PermissionsGuard implements CanActivate {
 
     const { user } = context
       .switchToHttp()
-      .getRequest<{ user: requestedUserInterface.RequestedUser }>();
+      .getRequest<{ user: RequestedUser }>();
 
     if (!user || !user.permissions) {
       throw new ForbiddenException('You do not have the required permissions');
