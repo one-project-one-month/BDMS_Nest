@@ -36,7 +36,7 @@ export class DonationsService {
 
     try {
       const donation = await this.donationsRepo.createDonation({
-        donorId: donorId!,
+        donorId: donorId,
         hospitalId: user.hospital_id,
         userId: user.id,
         donationCode: this.generateDonationCode(),
