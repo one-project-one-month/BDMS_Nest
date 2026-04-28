@@ -17,6 +17,7 @@ import { MedicalRecordsModule } from './medical-records/medical-records.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { MailModule } from './mail/mail.module';
 import { HospitalsModule } from './hospitals/hospitals.module';
+import { DonorsModule } from './donors/donors.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 
@@ -51,6 +52,7 @@ import KeyvRedis from '@keyv/redis';
     MedicalRecordsModule,
     CertificatesModule,
     HospitalsModule,
+    DonorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
