@@ -30,6 +30,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 # Copy full node_modules — prisma CLI (devDep) is required for migrate deploy at startup
 COPY --from=builder /app/node_modules ./node_modules
 
