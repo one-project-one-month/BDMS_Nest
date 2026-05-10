@@ -14,5 +14,6 @@ coverage
 .prettierrc
 README.md
 prisma/seed.ts
+prisma.config.ts
 docs
 *.md
