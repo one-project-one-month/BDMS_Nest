@@ -13,9 +13,6 @@ coverage
 .eslintrc.js
 .prettierrc
 README.md
-nest-cli.json
-tsconfig.json
-tsconfig.build.json
 prisma/seed.ts
 docs
 *.md
