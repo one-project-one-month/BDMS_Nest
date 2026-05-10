@@ -1,24 +1,6 @@
 name: bdms_nest
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: bdms_db
-    environment:
-      POSTGRES_DB: bdms
-      POSTGRES_USER: opom
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - bdms_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U opom"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   api:
     build:
       context: .
@@ -27,14 +9,8 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-    depends_on:
-      postgres:
-        condition: service_healthy
     env_file:
       - .env
     environment:
       - NODE_ENV=production
     command: sh -c "./node_modules/.bin/prisma migrate deploy && node dist/src/main.js"
-
-volumes:
-  bdms_postgres_data:
