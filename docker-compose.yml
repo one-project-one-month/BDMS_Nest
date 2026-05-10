@@ -35,7 +35,7 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://opom:${POSTGRES_PASSWORD}@postgres:5432/bdms?schema=public
-    command: sh -c "pnpm prisma migrate deploy && node dist/src/main.js"
+    command: sh -c "./node_modules/.bin/prisma migrate deploy && node dist/src/main.js"
 
 volumes:
   bdms_postgres_data:
