@@ -19,5 +19,23 @@ services:
       retries: 5
     restart: unless-stopped
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bdms_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://opom:i_got_hacked@postgres:5432/bdms?schema=public
+    command: sh -c "pnpm prisma migrate deploy && node dist/src/main.js"
+
 volumes:
   bdms_postgres_data:
