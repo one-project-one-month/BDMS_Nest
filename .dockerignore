@@ -16,7 +16,6 @@ README.md
 nest-cli.json
 tsconfig.json
 tsconfig.build.json
-prisma/migrations
 prisma/seed.ts
 docs
 *.md
